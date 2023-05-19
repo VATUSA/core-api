@@ -1,3 +1,4 @@
+from __future__ import annotations
 import datetime
 
 import ormar
@@ -73,6 +74,51 @@ class APIErrorLog(ormar.Model):
     request_id: str = ormar.String(max_length=120)
     error_message: str = ormar.Text()
     error_traceback: str = ormar.Text(nullable=True)
+
+
+class CoreAPIToken(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'core_api_token'
+    id: int = ormar.Integer(primary_key=True)
+    name: str = ormar.String(max_length=120)
+    token: str = ormar.String(max_length=80)
+    enabled: bool = ormar.Boolean()
+    can_read_all: bool = ormar.Boolean()
+    can_write_all: bool = ormar.Boolean()
+
+
+class CoreAPITokenPermission(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'core_api_token_permission'
+    id: int = ormar.Integer(primary_key=True)
+    api_token: CoreAPIToken = ormar.ForeignKey(CoreAPIToken, related_name='permissions')
+    object: str = ormar.String(max_length=120)
+    can_read: bool = ormar.Boolean()
+    can_write: bool = ormar.Boolean()
+
+
+class TransferHold(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'transfer_hold'
+    id: int = ormar.Integer(primary_key=True)
+    controller: int = ormar.Integer()
+    hold: str = ormar.String(max_length=120)
+    start_date: datetime.datetime = ormar.DateTime(nullable=True)
+    end_date: datetime.datetime = ormar.DateTime(nullable=True)
+    is_released: bool = ormar.Boolean(default=False)
+    released_by_cid: int = ormar.Integer(nullable=True, default=None)
+    created_by_cid: int = ormar.Integer(nullable=True)
+
+    @staticmethod
+    async def active_by_cid(cid: int) -> list[TransferHold]:
+        holds: list[TransferHold] = await TransferHold.objects\
+            .filter(controller=cid)\
+            .filter(is_released=False)\
+            .filter((
+                ((TransferHold.start_date.isnull(True)) | (TransferHold.start_date <= datetime.datetime.now()))
+                & ((TransferHold.end_date.isnull(True)) | (TransferHold.end_date > datetime.datetime.now()))
+            )).all()
+        return holds
 
 
 class Session(ormar.Model):

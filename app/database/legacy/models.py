@@ -6,6 +6,17 @@ import ormar
 from .base import BaseMeta
 
 
+class ActionLog(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'action_log'
+    id: int = ormar.Integer(primary_key=True)
+    from_: int = ormar.Integer(name='from')
+    to: int = ormar.Integer()
+    log: str = ormar.Text()
+    created_at: datetime.datetime = ormar.DateTime()
+    updated_at: datetime.datetime = ormar.DateTime()
+
+
 class Controller(ormar.Model):
     class Meta(BaseMeta):
         tablename = 'controllers'
@@ -69,22 +80,6 @@ class Facility(ormar.Model):
     api_sandbox_ip: str = ormar.String(max_length=128)
 
 
-class Hold(ormar.Model):
-    class Meta(BaseMeta):
-        tablename = 'holds'
-    hold_id: int = ormar.Integer(primary_key=True)
-    controller: Controller = ormar.ForeignKey(Controller)
-    hold_type: str = ormar.String(max_length=120)
-    start_date: datetime.datetime = ormar.DateTime(nullable=True)
-    end_date: datetime.datetime = ormar.DateTime(nullable=True)
-    created_date: datetime.datetime = ormar.DateTime(nullable=True)
-    created_by_cid: int = ormar.Integer()
-    released: bool = ormar.Boolean(default=False)
-    released_date: datetime.datetime = ormar.DateTime(nullable=True)
-    released_by_cid: int = ormar.Integer(nullable=True)
-    released_message: str = ormar.String(max_length=255, nullable=True)
-
-
 class Promotion(ormar.Model):
     class Meta(BaseMeta):
         tablename = 'promotions'
@@ -109,6 +104,7 @@ class Role(ormar.Model):
     facility: str = ormar.String(max_length=3)
     role: str = ormar.String(max_length=12)
     created_at: datetime.datetime = ormar.DateTime()
+
 
 class Solo(ormar.Model):
     class Meta(BaseMeta):
@@ -153,8 +149,8 @@ class Transfer(ormar.Model):
     from_: str = ormar.String(max_length=3, name='from')
     reason: str = ormar.Text()
     status: int = ormar.Integer()
-    actiontext: str = ormar.Text(nullable=True)
-    actionby: int = ormar.Integer(nullable=True)
+    actiontext: str = ormar.Text(nullable=True, default=None)
+    actionby: int = ormar.Integer(nullable=True, default=None)
     created_at: datetime.datetime = ormar.DateTime()
     updated_at: datetime.datetime = ormar.DateTime()
 

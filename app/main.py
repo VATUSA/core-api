@@ -1,16 +1,17 @@
-from fastapi import FastAPI
-from app.common import middleware
+from typing import Annotated
+from fastapi import Depends, FastAPI
+from app import auth, middleware
 from app.database.legacy import connection as legacy_connection
 from app.database.lightning import connection as lightning_connection
-from .routers import academy, controller, info, roster, solo, training_record, transfer
+from app.routers import training, transfer
+# from app.routers import academy, controller, info, roster, solo, training_record, transfer
 
 app = FastAPI()
 
 # app.add_middleware(middleware.HelperPreCacheMiddleware)
 
-app.include_router(academy.router)
-app.include_router(info.router)
-app.include_router(roster.router)
+app.include_router(training.router)
+app.include_router(transfer.router)
 
 
 legacy_connection.attach(app)

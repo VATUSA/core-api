@@ -19,14 +19,14 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-from ..models import BaseMeta
+from app.database.lightning.models import BaseMeta
 target_metadata = BaseMeta.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-from ..connection import CONNECTION_STRING
+from app.database.lightning.connection import CONNECTION_STRING
 config.set_main_option('sqlalchemy.url', CONNECTION_STRING)
 
 
