@@ -1,4 +1,4 @@
-FROM python:3.10.0
+FROM python:3.10.5
 
 EXPOSE 80
 
@@ -8,7 +8,7 @@ COPY ./requirements.txt /code/requirements.txt
 
 RUN pip3 install gitpython
 
-RUN pip3 install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip3 install --no-cache-dir -r /code/requirements.txt
 
 COPY ./alembic.ini /code/alembic.ini
 
