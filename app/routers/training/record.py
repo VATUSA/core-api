@@ -3,10 +3,10 @@ from typing import Optional, Annotated
 import pydantic
 from fastapi import APIRouter, Depends, HTTPException
 
-from app import auth, models
+from app import auth
 from app.database.legacy import models as legacy
-from app.database.lightning import models as lightning
 from app.helper import action_log
+from vatusa_core import models
 
 
 router = APIRouter(

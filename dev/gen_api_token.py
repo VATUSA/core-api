@@ -40,10 +40,10 @@ async def main():
 
         for obj in objects:
             print(f'Permissions for {obj.value}:')
-            permission_in = input('\tOptions: 0 - None, 1 - Read Only, 2 - Write Only, 3 - Read and Write')
+            permission_in = input('\tOptions: 0 - None, 1 - Read Only, 2 - Write Only, 3 - Read and Write: ')
             while permission_in not in ['0', '1', '2', '3']:
                 print("Invalid Input")
-                permission_in = input('\tOptions: 0 - None, 1 - Read Only, 2 - Write Only, 3 - Read and Write')
+                permission_in = input('\tOptions: 0 - None, 1 - Read Only, 2 - Write Only, 3 - Read and Write: ')
             if permission_in in ['1', '2', '3']:
                 permission = lightning.CoreAPITokenPermission(
                     api_token=token,
@@ -59,6 +59,7 @@ async def main():
     print(f"\tToken: {token.token}")
     print(SEPARATOR)
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 coroutine = main()
 loop.run_until_complete(coroutine)

@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import enum
-import os
 from fastapi import Header, HTTPException
 from typing import Optional
 from app.database.lightning import models as lightning

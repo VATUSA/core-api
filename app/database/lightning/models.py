@@ -2,7 +2,6 @@ from __future__ import annotations
 import datetime
 
 import ormar
-
 from .base import BaseMeta
 
 
@@ -97,30 +96,6 @@ class CoreAPITokenPermission(ormar.Model):
     can_write: bool = ormar.Boolean()
 
 
-class TransferHold(ormar.Model):
-    class Meta(BaseMeta):
-        tablename = 'transfer_hold'
-    id: int = ormar.Integer(primary_key=True)
-    controller: int = ormar.Integer()
-    hold: str = ormar.String(max_length=120)
-    start_date: datetime.datetime = ormar.DateTime(nullable=True)
-    end_date: datetime.datetime = ormar.DateTime(nullable=True)
-    is_released: bool = ormar.Boolean(default=False)
-    released_by_cid: int = ormar.Integer(nullable=True, default=None)
-    created_by_cid: int = ormar.Integer(nullable=True)
-
-    @staticmethod
-    async def active_by_cid(cid: int) -> list[TransferHold]:
-        holds: list[TransferHold] = await TransferHold.objects\
-            .filter(controller=cid)\
-            .filter(is_released=False)\
-            .filter((
-                ((TransferHold.start_date.isnull(True)) | (TransferHold.start_date <= datetime.datetime.now()))
-                & ((TransferHold.end_date.isnull(True)) | (TransferHold.end_date > datetime.datetime.now()))
-            )).all()
-        return holds
-
-
 class Session(ormar.Model):
     class Meta(BaseMeta):
         tablename = 'session'
@@ -130,3 +105,41 @@ class Session(ormar.Model):
     expires: datetime.datetime = ormar.DateTime()
     is_invalidated: bool = ormar.Boolean(default=False)
     is_blocked: bool = ormar.Boolean(default=False)
+
+
+class ManagedWorkspaceAccount(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'managed_workspace_account'
+    id: int = ormar.Integer(primary_key=True)
+    cid: int = ormar.Integer()
+    username: str = ormar.String(max_length=80, nullable=True)
+    can_self_serve: bool = ormar.Boolean(default=True)
+    workspace_account_id: int = ormar.Integer(nullable=True, default=None)
+    is_account_enabled: bool = ormar.Boolean(default=False)
+
+    @classmethod
+    def query(cls):
+        return cls.objects.prefetch_related([ManagedWorkspaceAccount.aliases, ManagedWorkspaceAccount.aliases.domain])
+
+
+class ManagedWorkspaceDomain(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'managed_workspace_domain'
+    id: int = ormar.Integer(primary_key=True)
+    name: str = ormar.String(max_length=120)
+    facility: str = ormar.String(max_length=4, nullable=True)
+    is_enabled: bool = ormar.Boolean(default=False)
+
+    @classmethod
+    async def all_by_facility(cls, facility: str):
+        return await cls.objects.filter(facility=facility).filter(is_enabled=True).all()
+
+
+class ManagedWorkspaceAccountAlias(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = 'managed_workspace_account_domain'
+    id: int = ormar.Integer(primary_key=True)
+    account: ManagedWorkspaceAccount = ormar.ForeignKey(ManagedWorkspaceAccount, related_name='aliases')
+    domain: ManagedWorkspaceDomain = ormar.ForeignKey(ManagedWorkspaceDomain)
+    alias: str = ormar.String(max_length=80)
+
