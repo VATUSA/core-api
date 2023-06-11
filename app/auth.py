@@ -10,9 +10,11 @@ API_KEY_MIN_LENGTH = 20
 
 
 class PermissionObject(enum.Enum):
+    CONTROLLER = 'controller'
     TRAINING_RECORD = 'training_record'
     TRANSFER = 'transfer'
     TRANSFER_HOLD = 'transfer_hold'
+    VATSIM_SYNC = 'vatsim_sync'
 
 
 class APIKey:

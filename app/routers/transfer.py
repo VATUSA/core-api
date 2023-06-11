@@ -2,7 +2,6 @@ import datetime
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 
-import app.database.legacy.models
 from app import auth, constants
 from app.database.legacy import models as legacy
 from app.helper import action_log
